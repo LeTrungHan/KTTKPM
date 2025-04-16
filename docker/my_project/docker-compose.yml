@@ -1,0 +1,189 @@
+# Bài 1: Chạy Nginx
+version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+
+# Bài 2: Chạy MySQL
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: mydb
+    ports:
+      - "3306:3306"
+
+# Bài 3: MySQL + PHPMyAdmin
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+
+# Bài 4: Chạy ứng dụng Node.js
+version: '3'
+services:
+  nodeapp:
+    build: .
+    ports:
+      - "3000:3000"
+
+# Bài 5: Chạy Redis
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+# Bài 6: Chạy WordPress với MySQL
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: user
+      WORDPRESS_DB_PASSWORD: password
+
+# Bài 7: Chạy MongoDB và Mongo Express
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+
+# Bài 8: Node.js kết nối MySQL
+version: '3'
+services:
+  nodeapp:
+    build: .
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+
+# Bài 9: Chạy Flask
+version: '3'
+services:
+  flaskapp:
+    build: .
+    ports:
+      - "5000:5000"
+
+# Bài 10: MySQL với Volumes
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
+
+# Bài 11: PostgreSQL + Adminer
+version: '3'
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+  adminer:
+    image: adminer
+    ports:
+      - "8083:8080"
+
+# Bài 12: Prometheus + Grafana
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+
+# Bài 13: Chạy React với Nginx
+version: '3'
+services:
+  reactapp:
+    build: .
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+
+# Bài 14: Mạng riêng giữa container
+version: '3'
+networks:
+  private_network:
+services:
+  service1:
+    image: alpine
+    networks:
+      - private_network
+  service2:
+    image: alpine
+    networks:
+      - private_network
+
+# Bài 15: Giới hạn tài nguyên cho Redis
+version: '3'
+services:
+  redis:
+    image: redis
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "256M"
