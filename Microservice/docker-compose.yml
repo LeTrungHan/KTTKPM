@@ -1,0 +1,113 @@
+version: '3'
+services:
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PRODUCT_SERVICE_URL=http://product-service:3001
+      - ORDER_SERVICE_URL=http://order-service:3002
+      - CUSTOMER_SERVICE_URL=http://customer-service:3003
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - product-service
+      - order-service
+      - customer-service
+      - rabbitmq
+    networks:
+      - app-network
+
+  # Product Service
+  product-service:
+    build: ./product-service
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGO_URI=mongodb://mongo-product:27017/product_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - mongo-product
+      - rabbitmq
+    networks:
+      - app-network
+
+  # Order Service
+  order-service:
+    build: ./order-service
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGO_URI=mongodb://mongo-order:27017/order_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - PRODUCT_SERVICE_URL=http://product-service:3001
+      - CUSTOMER_SERVICE_URL=http://customer-service:3003
+    depends_on:
+      - mongo-order
+      - rabbitmq
+    networks:
+      - app-network
+
+  # Customer Service
+  customer-service:
+    build: ./customer-service
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGO_URI=mongodb://mongo-customer:27017/customer_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - mongo-customer
+      - rabbitmq
+    networks:
+      - app-network
+
+  # MongoDB cho Product Service
+  mongo-product:
+    image: mongo:latest
+    volumes:
+      - mongo-product-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+  # MongoDB cho Order Service
+  mongo-order:
+    image: mongo:latest
+    volumes:
+      - mongo-order-data:/data/db
+    ports:
+      - "27018:27017"
+    networks:
+      - app-network
+
+  # MongoDB cho Customer Service
+  mongo-customer:
+    image: mongo:latest
+    volumes:
+      - mongo-customer-data:/data/db
+    ports:
+      - "27019:27017"
+    networks:
+      - app-network
+
+  # RabbitMQ cho Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - "5672:5672"  # AMQP protocol port
+      - "15672:15672"  # Management UI
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-product-data:
+  mongo-order-data:
+  mongo-customer-data:

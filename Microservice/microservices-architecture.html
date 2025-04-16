@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiến Trúc Microservices Quản Lý Bán Hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .service {
+            min-height: 100px;
+            transition: all 0.3s;
+        }
+        .service:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        .connection-line {
+            position: absolute;
+            background-color: #CBD5E0;
+            z-index: -1;
+        }
+        .message {
+            position: absolute;
+            background-color: #FFF;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        @media print {
+            body {
+                width: 100%;
+                height: auto;
+            }
+            .page-container {
+                margin: 0;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="page-container max-w-6xl mx-auto px-4 py-10">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Kiến Trúc Microservices Quản Lý Bán Hàng</h1>
+        
+        <div class="relative" style="height: 900px;">
+            <!-- API Gateway -->
+            <div class="service absolute top-10 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white rounded-lg p-4 w-64 text-center shadow-lg z-10">
+                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-2">API Gateway</h3>
+                <p class="text-sm">Điểm truy cập duy nhất cho client</p>
+            </div>
+            
+            <!-- Message Broker -->
+            <div class="service absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-600 text-white rounded-lg p-4 w-64 text-center shadow-lg z-10">
+                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-2">Message Broker</h3>
+                <p class="text-sm">RabbitMQ / Kafka</p>
+            </div>
+            
+            <!-- Product Service -->
+            <div class="service absolute top-60 left-1/4 transform -translate-x-1/2 bg-green-500 text-white rounded-lg p-4 w-60 text-center shadow-lg z-10">
+                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-2">Product Service</h3>
+                <p class="text-sm">Quản lý thông tin sản phẩm</p>
+                <div class="mt-3 bg-green-600 rounded p-2">
+                    <span class="text-xs font-semibold">MongoDB</span>
+                </div>
+            </div>
+            
+            <!-- Order Service -->
+            <div class="service absolute top-60 left-3/4 transform -translate-x-1/2 bg-red-500 text-white rounded-lg p-4 w-60 text-center shadow-lg z-10">
+                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-2">Order Service</h3>
+                <p class="text-sm">Quản lý đơn hàng</p>
+                <div class="mt-3 bg-red-600 rounded p-2">
+                    <span class="text-xs font-semibold">MongoDB</span>
+                </div>
+            </div>
+            
+            <!-- Customer Service -->
+            <div class="service absolute top-80 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white rounded-lg p-4 w-60 text-center shadow-lg z-10">
+                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-2">Customer Service</h3>
+                <p class="text-sm">Quản lý thông tin khách hàng</p>
+                <div class="mt-3 bg-yellow-600 rounded p-2">
+                    <span class="text-xs font-semibold">MongoDB</span>
+                </div>
+            </div>
+            
+            <!-- Client -->
+            <div class="service absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white rounded-lg p-4 w-48 text-center shadow-lg z-10">
+                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold mb-2">Client Application</h3>
+                <p class="text-xs">Web / Mobile</p>
+            </div>
+            
+            <!-- Docker Container Labels -->
+            <div class="absolute top-10 right-16 bg-blue-100 border-l-4 border-blue-500 p-3 rounded shadow-md w-64">
+                <h4 class="text-blue-800 font-semibold mb-1">Docker Containers</h4>
+                <p class="text-xs text-blue-600">Mỗi service được đóng gói trong container Docker riêng biệt</p>
+            </div>
+            
+            <!-- MongoDB Label -->
+            <div class="absolute bottom-20 right-16 bg-green-100 border-l-4 border-green-500 p-3 rounded shadow-md w-64">
+                <h4 class="text-green-800 font-semibold mb-1">MongoDB Databases</h4>
+                <p class="text-xs text-green-600">Mỗi service có database MongoDB riêng, được quản lý bằng MongoDB Compass</p>
+            </div>
+            
+            <!-- Connection Lines -->
+            <!-- API Gateway to Client -->
+            <div class="connection-line" style="width: 2px; height: 100px; top: 185px; left: 50%;"></div>
+            <div class="message" style="top: 230px; left: 52%;">HTTP Requests</div>
+            
+            <!-- API Gateway to Services -->
+            <div class="connection-line" style="width: 120px; height: 2px; top: 135px; left: 33%;"></div>
+            <div class="connection-line" style="width: 120px; height: 2px; top: 135px; left: 53%;"></div>
+            
+            <!-- API Gateway to Message Broker -->
+            <div class="connection-line" style="width: 2px; height: 100px; top: 160px; left: 50%;"></div>
+            
+            <!-- Services to Message Broker -->
+            <div class="connection-line" style="width: 100px; height: 2px; top: 350px; left: 42%;"></div>
+            <div class="connection-line" style="width: 100px; height: 2px; top: 350px; left: 50%;"></div>
+            
+            <!-- Message descriptions -->
+            <div class="message" style="top: 135px; left: 39%;">REST API</div>
+            <div class="message" style="top: 200px; left: 52%;">Event Publish</div>
+            <div class="message" style="top: 350px; left: 38%;">Event Subscribe</div>
+            <div class="message" style="top: 280px; left: 58%;">Service-to-Service</div>
+            
+            <!-- Services to Services -->
+            <div class="connection-line" style="width: 100px; height: 2px; top: 300px; left: 40%; transform: rotate(45deg);"></div>
+            
+            <!-- Horizontal line from Client to Gateway -->
+            <div class="connection-line" style="width: 2px; height: 200px; top: 590px; left: 50%;"></div>
+        </div>
+        
+        <div class="mt-16 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Mô Tả Kiến Trúc</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <h3 class="text-xl font-semibold text-gray-700">1. Các Thành Phần Chính</h3>
+                    <ul class="list-disc pl-6 text-gray-600 space-y-1">
+                        <li><span class="font-semibold">API Gateway:</span> Điểm truy cập duy nhất cho client, routing requests đến các services tương ứng</li>
+                        <li><span class="font-semibold">Product Service:</span> Quản lý thông tin sản phẩm (tên, giá, mô tả, tồn kho)</li>
+                        <li><span class="font-semibold">Order Service:</span> Quản lý đơn hàng (tạo, xem, hủy đơn hàng)</li>
+                        <li><span class="font-semibold">Customer Service:</span> Quản lý thông tin khách hàng (tên, địa chỉ, thông tin liên lạc)</li>
+                        <li><span class="font-semibold">Message Broker:</span> RabbitMQ/Kafka cho giao tiếp bất đồng bộ giữa các services</li>
+                    </ul>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="text-xl font-semibold text-gray-700">2. Mô Hình Giao Tiếp</h3>
+                    <ul class="list-disc pl-6 text-gray-600 space-y-1">
+                        <li><span class="font-semibold">Đồng bộ:</span> REST API/gRPC cho giao tiếp trực tiếp giữa các services</li>
+                        <li><span class="font-semibold">Bất đồng bộ:</span> Event-driven communication qua Message Broker</li>
+                        <li><span class="font-semibold">Mẫu CQRS:</span> Tách biệt thao tác đọc và ghi để tối ưu hóa hiệu suất</li>
+                        <li><span class="font-semibold">Xử lý sự kiện:</span> Publish/Subscribe mô hình giao tiếp giữa các services</li>
+                    </ul>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="text-xl font-semibold text-gray-700">3. Lưu Trữ Dữ Liệu</h3>
+                    <ul class="list-disc pl-6 text-gray-600 space-y-1">
+                        <li><span class="font-semibold">Database per Service:</span> Mỗi microservice có database MongoDB riêng</li>
+                        <li><span class="font-semibold">MongoDB Compass:</span> Công cụ quản lý và trực quan hóa databases</li>
+                        <li><span class="font-semibold">Data Consistency:</span> Sử dụng các mẫu như Saga để đảm bảo tính nhất quán của dữ liệu</li>
+                    </ul>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="text-xl font-semibold text-gray-700">4. Containerization</h3>
+                    <ul class="list-disc pl-6 text-gray-600 space-y-1">
+                        <li><span class="font-semibold">Docker:</span> Mỗi service được containerized riêng biệt</li>
+                        <li><span class="font-semibold">Docker Compose:</span> Định nghĩa và quản lý tất cả các containers như một ứng dụng thống nhất</li>
+                        <li><span class="font-semibold">Scalability:</span> Dễ dàng scale các services độc lập với nhau</li>
+                        <li><span class="font-semibold">Portability:</span> Đảm bảo ứng dụng chạy nhất quán trên mọi môi trường</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 border-t border-gray-200 pt-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Triển Khai Thực Tế</h3>
+                <ol class="list-decimal pl-6 text-gray-600 space-y-2">
+                    <li>Triển khai với Docker Compose: <code class="bg-gray-100 px-2 py-1 rounded text-sm">docker-compose up -d</code></li>
+                    <li>Mỗi service được build từ Dockerfile riêng, các Dockerfile được định nghĩa trong thư mục tương ứng</li>
+                    <li>MongoDB được khởi chạy trong container riêng, dữ liệu được persist thông qua Docker volumes</li>
+                    <li>MongoDB Compass kết nối đến các database containers qua các cổng được exposed</li>
+                    <li>API Gateway expose cổng duy nhất cho client, tất cả các requests đều đi qua Gateway</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
