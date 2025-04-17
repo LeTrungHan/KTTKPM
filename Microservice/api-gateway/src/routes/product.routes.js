@@ -3,7 +3,7 @@ const router = express.Router();
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const authMiddleware = require('../middleware/auth.middleware');
 
-// Middleware xác thực (có thể bỏ comment nếu cần)
+// Middleware xác thực 
 // router.use(authMiddleware);
 
 // Tất cả các request đến /api/products sẽ được chuyển tiếp đến Product Service

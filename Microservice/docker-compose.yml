@@ -1,4 +1,3 @@
-version: '3'
 services:
   # API Gateway
   api-gateway:
@@ -9,11 +8,17 @@ services:
       - PRODUCT_SERVICE_URL=http://product-service:3001
       - ORDER_SERVICE_URL=http://order-service:3002
       - CUSTOMER_SERVICE_URL=http://customer-service:3003
+      - PAYMENT_SERVICE_URL=http://payment-service:3004
+      - INVENTORY_SERVICE_URL=http://inventory-service:3005
+      - SHIPPING_SERVICE_URL=http://shipping-service:3006
       - RABBITMQ_URL=amqp://rabbitmq:5672
     depends_on:
       - product-service
       - order-service
       - customer-service
+      - payment-service
+      - inventory-service
+      - shipping-service
       - rabbitmq
     networks:
       - app-network
@@ -59,6 +64,76 @@ services:
     depends_on:
       - mongo-customer
       - rabbitmq
+    networks:
+      - app-network
+  # Payment Service
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "3004:3004"
+    environment:
+      - MONGO_URI=mongodb://mongo-payment:27017/payment_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - ORDER_SERVICE_URL=http://order-service:3002
+    depends_on:
+      - mongo-payment
+      - rabbitmq
+    networks:
+      - app-network
+
+  inventory-service:
+    build: ./inventory-service
+    ports:
+      - "3005:3005"
+    environment:
+      - MONGO_URI=mongodb://mongo-inventory:27017/inventory_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - PRODUCT_SERVICE_URL=http://product-service:3001
+    depends_on:
+      - mongo-inventory
+      - rabbitmq
+    networks:
+      - app-network
+
+  shipping-service:
+    build: ./shipping-service
+    ports:
+      - "3006:3006"
+    environment:
+      - MONGO_URI=mongodb://mongo-shipping:27017/shipping_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - ORDER_SERVICE_URL=http://order-service:3002
+    depends_on:
+      - mongo-shipping
+      - rabbitmq
+    networks:
+      - app-network
+
+  # Databases for new services
+  mongo-payment:
+    image: mongo:latest
+    volumes:
+      - mongo-payment-data:/data/db
+    ports:
+      - "27020:27017"
+    networks:
+      - app-network
+
+  mongo-inventory:
+    image: mongo:latest
+    volumes:
+      - mongo-inventory-data:/data/db
+    ports:
+      - "27021:27017"
+    networks:
+      - app-network
+
+  mongo-shipping:
+    image: mongo:latest
+    volumes:
+      - mongo-shipping-data:/data/db
+    ports:
+      - "27022:27017"
     networks:
       - app-network
 
@@ -111,3 +186,6 @@ volumes:
   mongo-product-data:
   mongo-order-data:
   mongo-customer-data:
+  mongo-payment-data:
+  mongo-inventory-data:
+  mongo-shipping-data:

@@ -7,6 +7,9 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
 const customerRoutes = require('./routes/customer.routes');
+const paymentRoutes = require('./routes/payment.routes');
+const inventoryRoutes = require('./routes/inventory.routes');
+const shippingRoutes = require('./routes/shipping.routes');
 
 // Middleware
 const authMiddleware = require('./middleware/auth.middleware');
@@ -44,10 +47,45 @@ const customerServiceProxy = createProxyMiddleware({
   },
 });
 
+const paymentServiceProxy = createProxyMiddleware({
+  target: process.env.PAYMENT_SERVICE_URL || 'http://localhost:3004',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/payments': '/payments',
+  },
+});
+
+const inventoryServiceProxy = createProxyMiddleware({
+  target: process.env.INVENTORY_SERVICE_URL || 'http://localhost:3005',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/inventory': '/inventory',
+  },
+});
+
+const shippingServiceProxy = createProxyMiddleware({
+  target: process.env.SHIPPING_SERVICE_URL || 'http://localhost:3006',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/shipping': '/shipping',
+  },
+});
+
 // Routes
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/payments', paymentRoutes);       
+app.use('/api/inventory', inventoryRoutes);    
+app.use('/api/shipping', shippingRoutes);      
+
+// Apply proxies
 app.use('/api/products', productServiceProxy);
 app.use('/api/orders', orderServiceProxy);
 app.use('/api/customers', customerServiceProxy);
+app.use('/api/payments', paymentServiceProxy);
+app.use('/api/inventory', inventoryServiceProxy);
+app.use('/api/shipping', shippingServiceProxy);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
